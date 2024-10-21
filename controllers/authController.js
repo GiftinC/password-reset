@@ -58,7 +58,7 @@ export const forgotPassword = async (req, res) => {
             },
         });
 
-        const resetLink = `http://localhost:${process.env.FEPORT}/reset-password?token=${resetToken}`;`http://localhost:`
+        const resetLink = `${NETLIFY_URL}/reset-password?token=${resetToken}`;`http://localhost:`
         const mailOptions = {
             from: process.env.EMAIL,
             to: email,
