@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-    origin: "https://aquamarine-jalebi-01eea5.netlify.app",
+    origin: `${process.env.NETLIFY_URL}`,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204
