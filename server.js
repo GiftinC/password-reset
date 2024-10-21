@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import url from 'url';
-import Routes from './Routes/Authroutes.js'; // Import the routes
 
 
 import { forgotPassword, resetPassword, loginUser, registerUser } from './controllers/authController.js';
@@ -22,7 +21,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use('/api/auth', Routes);
 
 const connectDB = async () => {
     try {
