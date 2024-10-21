@@ -9,17 +9,18 @@ dotenv.config();
 // Login function
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
-    console.log(req.body);
+    console.log("Received Email :", email);
 
     try {
         const user = await User.findOne({ email });
-        console.log(user.password);
         if (!user) {
             return res.status(401).json({ message: 'Invalid email' });
         }
 
         // Use await to correctly check the password
         const isMatch = await bcrypt.compare(password, user.password);
+        console.log(password);
+        console.log("Compared to Password", user.password);
         console.log('Password match:', isMatch);
 
         if (!isMatch) {
@@ -33,8 +34,6 @@ export const loginUser = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
-
-
 
 // Forgot Password
 export const forgotPassword = async (req, res) => {
@@ -59,12 +58,12 @@ export const forgotPassword = async (req, res) => {
             },
         });
 
-        const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+        const resetLink = `http://localhost:${process.env.FEPORT}/reset-password?token=${resetToken}`;`http://localhost:`
         const mailOptions = {
             from: process.env.EMAIL,
             to: email,
             subject: 'Password Reset Link',
-            text: `Here is your password reset link: ${resetLink} , Link valid for the next 1 hour`,
+            text: `Here is your password reset link: ${resetLink}, Link valid for the next 1 hour`,
         };
 
         await transporter.sendMail(mailOptions);
@@ -89,7 +88,8 @@ export const resetPassword = async (req, res) => {
             return res.status(400).json({ message: 'Invalid or expired token' });
         }
 
-        user.password = await bcrypt.hash(newPassword, 10);
+        // Updating password is handled in the pre-save hook
+        user.password = newPassword; // Seting the new password, hashing will be done in pre-save hook
         user.resetToken = undefined;
         user.resetTokenExpiration = undefined;
         await user.save();
@@ -106,16 +106,16 @@ export const registerUser = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Check if the email is already in use
+        // To Check if the email is already in use
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'Email is already registered' });
         }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ email, password: hashedPassword });
-        await user.save(); // Save the new user
+        // Created the user directly, password will be hashed in the pre-save hook
+        const user = new User({ email, password }); // Store password in plain text for hashing in the schema
+        await user.save();
+        console.log("User registered successfully");
 
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
@@ -123,4 +123,3 @@ export const registerUser = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
-

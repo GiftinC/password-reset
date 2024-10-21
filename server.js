@@ -4,14 +4,17 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import url from 'url';
-import { forgotPassword, resetPassword , loginUser , registerUser} from './controllers/authController.js';
+import Routes from './Routes/Authroutes.js'; // Import the routes
+
+
+import { forgotPassword, resetPassword, loginUser, registerUser } from './controllers/authController.js';
 
 dotenv.config();
 
 const app = express();
 
 const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: `http://localhost:${process.env.FEPORT}`,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204
@@ -19,6 +22,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use('/api/auth', Routes);
 
 const connectDB = async () => {
     try {
@@ -49,5 +53,5 @@ app.get('*', (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -11,18 +11,24 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  resetToken: String, // Token for password resets
-  resetTokenExpiration: Date, // Expiration time for the token
+  resetToken: {
+    type: String,
+  },
+  resetTokenExpiration: {
+    type: Date,
+  },
 });
 
+// Use bcrypt to hash password before saving the user
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return next();  // Only hash if password is modified
 
-  const saltRounds = 5;
+  const saltRounds = 10;
   this.password = await bcrypt.hash(this.password, saltRounds);
+  console.log('Password hashed in Schema:' , this.password);
   next();
 });
 
-const User = mongoose.model('users', userSchema);
+const User = mongoose.model('User', userSchema);
 
 export default User;
